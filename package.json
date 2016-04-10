@@ -1,0 +1,35 @@
+{
+	"name": "oubliation",
+	"version": "0.0.0",
+	"description": "A simple Wizardry clone.",
+	"author": "Kevin Grasso <kevgrasso@gmail.com>",
+	
+	"main": "",
+	"typings": "",
+	"engine": "node >= 1.0.0",
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"bugs": {
+		"url": ""
+	},
+	"private": true,
+	
+	"dependencies": {
+		"bower": "latest",
+		"tslint": "latest",
+		"typescript": "latest",
+		"typings": "latest"
+	},
+	
+	"scripts": {
+        "postinstall": "typings install && bower install",
+		"prebuild": "npm update && typings install && bower update",
+        "build": "tsc",
+        
+        "start": "#start server & watch",
+        "stop": "#can this be done?",
+        "test": ""
+	}
+}
