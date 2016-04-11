@@ -1,7 +1,4 @@
-﻿///<reference path="..\typings\browser.d.ts"/>
-///<reference path="..\ext\hotfixes.d.ts"/>
-
-//TODO: TypeScript 1.8: use metagenerics to describe reduce functions
+﻿//TODO: TypeScript 1.8: use metagenerics to describe reduce functions
 //use this type & new.target to describe constructor functions
 
 interface ComponentSignature { }  //todo: refactor out ComponentSignature

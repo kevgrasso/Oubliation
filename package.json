@@ -24,8 +24,9 @@
 	},
 	
 	"scripts": {
+        "preinstall": "npm install -g typescript && npm install -g typings && npm install -g bower",
         "postinstall": "typings install && bower install",
-		"prebuild": "npm update && typings install && bower update",
+		"prebuild": "npm update -g && typings install && bower update",
         "build": "tsc",
         
         "start": "#start server & watch",

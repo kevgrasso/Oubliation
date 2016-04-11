@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
-        "noImplicitAny": true,
+        "allowJs": true,
+        "noImplicitAny": false,
         "removeComments": true,
         "preserveConstEnums": true,
         "outFile": "dist/oubliation.js",
         "sourceMap": true,
-		"target": "es6",
-		"watch": true
+		"target": "es6"
     },
     "formatCodeOptions": {
         "indentSize": 4,
@@ -22,9 +22,11 @@
         "placeOpenBraceOnNewLineForFunctions": false,
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
-    "exclude": [
-		"dist",
-        "node_modules",
-		"typings"
+    "files": [
+        "bower_components/core.js/client/shim.js",
+        "bower_components/lodash/dist/lodash.core.js",
+        "typings/browser.d.ts",
+        "ext/hotfixes.d.ts",
+        "src/components.ts"
     ]
 }
