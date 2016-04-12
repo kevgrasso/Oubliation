@@ -14,7 +14,7 @@ class ComponentNode implements ComponentSignature {
     getPriority() {
         return this.priority
     }
-    
+
 }
 
 type PrototypeNode<T extends ComponentNode> = (owner: ComponentHub) => T
@@ -26,7 +26,9 @@ interface GetModifiers extends ComponentSignature {
 
 //this is all wrong somehow
 class Modifier extends ComponentNode implements GetModifiers {
-    constructor(owner: ComponentHub, origin: typeof Modifier, priority: number, private kind: string, ...modifiers: [(new (...any: any[]) => ComponentNode), any[]][]) { //needs to know what args each function should recieve
+    
+    //needs to know what args each function should recieve
+    constructor(owner: ComponentHub, origin: typeof Modifier, priority: number, private kind: string, ...modifiers: [(new (...any: any[]) => ComponentNode), any[]][]) { 
         super(owner, origin, priority)
         this.modifiers = modifiers
     }
@@ -44,7 +46,7 @@ class Modifier extends ComponentNode implements GetModifiers {
 }
 
 function prepNode<T extends ComponentNode>(LocalNode: new (...any: any[]) => T, ...args: any[]) {
-    return function (owner: ComponentHub) {
+    return function(owner: ComponentHub) {
         new LocalNode(owner, LocalNode, ...args)
     }
 }
@@ -122,19 +124,20 @@ type ReduceCallback<T> = (previousValue: T, currentValue: T, currentIndex: numbe
 //add more of these
 //newSum, newMax, newMin, newRange, newConcat, newFlow, newFlowRight
 function newFlatten<T extends ComponentNode, R>(data: T[], methodName: string, ...args: any[]): R[] {
-    return _.flatten<R>(_.invokeMap<T>(data, methodName, ...args))
+    return _.flatten<R>(_.invokeMap<T, R>(data, methodName, ...args))
 }
 
 function newFirst<T extends ComponentNode, R>(data: T[], methodName: string, ...args: any[]): R {
-    return _.invoke(data[0], methodName, ...args)
+    let result: R = _.invoke<T, R>(data[0], methodName, ...args)
+    return result
 }
 
 function newReduce<T extends ComponentNode, R>(data: T[], methodName: string, reduceFunc: ReduceCallback<R>, ...args: any[]): R {
-    return _.invokeMap<T>(data, methodName, ...args).reduce(reduceFunc)
+    return _.invokeMap<T, R>(data, methodName, ...args).reduce(reduceFunc)
 }
 
 function newReduceRight<T extends ComponentNode, R>(data: T[], methodName: string, reduceFunc: ReduceCallback<R>, ...args: any[]): R {
-    return _.invokeMap<T>(data, methodName, ...args).reduceRight(reduceFunc)
+    return _.invokeMap<T, R>(data, methodName, ...args).reduceRight(reduceFunc)
 }
 
 function newEvery<T extends ComponentNode>(data: T[], methodName: string, ...args: any[]) {
@@ -146,7 +149,7 @@ function newSome<T extends ComponentNode>(data: T[], methodName: string, ...args
 }
 
 function newJoin<E extends ComponentNode>(data: E[], methodName: string, separator: string, ...args: any[]) {
-    return (<string[]>_.invokeMap<E>(data, methodName, ...args)).join(separator)
+    return (_.invokeMap<E, string[]>(data, methodName, ...args)).join(separator)
 }
 
 //todo: refactor: functions w/ origin and priority attached directly

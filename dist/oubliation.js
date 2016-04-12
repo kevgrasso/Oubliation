@@ -5890,7 +5890,8 @@ function newFlatten(data, methodName, ...args) {
     return _.flatten(_.invokeMap(data, methodName, ...args));
 }
 function newFirst(data, methodName, ...args) {
-    return _.invoke(data[0], methodName, ...args);
+    let result = _.invoke(data[0], methodName, ...args);
+    return result;
 }
 function newReduce(data, methodName, reduceFunc, ...args) {
     return _.invokeMap(data, methodName, ...args).reduce(reduceFunc);
@@ -5905,7 +5906,7 @@ function newSome(data, methodName, ...args) {
     return data.some(_.method(methodName, ...args));
 }
 function newJoin(data, methodName, separator, ...args) {
-    return _.invokeMap(data, methodName, ...args).join(separator);
+    return (_.invokeMap(data, methodName, ...args)).join(separator);
 }
 class Thing extends ComponentHub {
     constructor(...args) {
