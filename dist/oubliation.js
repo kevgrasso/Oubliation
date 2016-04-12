@@ -4746,7 +4746,7 @@
 ;
 (function () {
     var undefined;
-    var VERSION = '4.9.0';
+    var VERSION = '4.10.0';
     var FUNC_ERROR_TEXT = 'Expected a function';
     var BIND_FLAG = 1, PARTIAL_FLAG = 32;
     var UNORDERED_COMPARE_FLAG = 1, PARTIAL_COMPARE_FLAG = 2;

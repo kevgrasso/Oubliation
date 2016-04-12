@@ -1,10 +1,10 @@
 {
 	"name": "oubliation",
-	"version": "0.0.0",
+	"version": "0.0.0-proto1",
 	"description": "A simple Wizardry clone.",
 	"author": "Kevin Grasso <kevgrasso@gmail.com>",
 	
-	"main": "",
+	"main": "dist/oubliation.js",
 	"typings": "",
 	"engine": "node >= 1.0.0",
 	"repository": {
