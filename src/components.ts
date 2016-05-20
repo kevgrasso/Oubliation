@@ -1,9 +1,13 @@
 
-"use strict"
+'use strict'
 
 class ComponentHub {
-    constructor(private spec: {[kind:string]: number}, ...componentSpecs: [new (...any) => ComponentPack, any[]][]) {
-        for (let kind in spec) {
+    private componentKinds: {[kind: string]: ComponentPack[]}
+    private componentPacks: Map<ComponentPack, ComponentNode[]>
+    private componentMethods: {[method: string]: ComponentNode[]}
+    
+    constructor(private spec: {[kind: string]: number}, ...componentSpecs: [new (...args: any[]) => ComponentPack, any[]][]) {
+        for (let kind of Object.getOwnPropertyNames(spec)) {
             this.componentKinds[kind] = []
         }
         
@@ -13,44 +17,40 @@ class ComponentHub {
         }
     }
     
-    componentKinds: {[kind: string]: ComponentPack[]}
-    componentPacks: Map<ComponentPack, ComponentNode[]>
-    componentMethods: {[method: string]: ComponentNode[]}
-    
-    hasPack(componentPack: ComponentPack) {
+    public hasPack(componentPack: ComponentPack) {
         const kind = componentPack.getKind()
         return _.includes(this.componentKinds[kind], componentPack)
     }
     
-    addPack(componentPack: ComponentPack) {
-        
+    public addPack(componentPack: ComponentPack) {
+        // TODO
     }
     
-    removePack(componentPack: ComponentPack) {
-        
+    public removePack(componentPack: ComponentPack) {
+        // TODO
     }
 }
 
 class ComponentPack {
-    constructor(private kind: string, ...componentSpecs: [new (...any) => ComponentNode, any[]][]) {
+        private componentSpecs: {
+            class: new (...args: any[]) => ComponentNode
+            args: any[]
+        }[]
+        
+    constructor(private kind: string, ...componentSpecs: [new (...args: any[]) => ComponentNode, any[]][]) {
         for (let componentSpec of componentSpecs) {
             this.componentSpecs.push({
                 class: componentSpec[0],
-                args:componentSpec[1]
+                args: componentSpec[1]
             })
         }
     }
-        componentSpecs: {
-            class: new (...any) => ComponentNode
-            args: any[]
-        }[]
     
-    
-    getKind() {
+    public getKind() {
         return this.kind
     }
     
-    getComponents(owner: ComponentHub) {
+    public getComponents(owner: ComponentHub) {
         return _.map(this.componentSpecs, (componentSpec) => {
             let args = componentSpec.args.splice(0, 0, ComponentHub)
             return new componentSpec.class(...args)
@@ -62,18 +62,18 @@ class ComponentNode {
     constructor(
         private owner: ComponentHub,
         private priority: number,
-        ...args: any[]  //get rid of this in later Typescript version if possible
-    ) { 
-        if (args.length != 0) {
-            throw new Error("ComponentNode should not be called with arguments besides owner and priority")
+        ...args: any[]  // HACK: get rid of this in later Typescript version if possible
+    ) {
+        if (args.length !== 0) {
+            throw new Error('ComponentNode should not be called with arguments besides owner and priority')
         }
     }
     
-    getOwner() {
+    public getOwner() {
         return this.owner
     }
-    getPriority() {
+    public getPriority() {
         return this.priority
     }
- 
+
 }

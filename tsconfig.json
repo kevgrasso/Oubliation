@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "allowJs": true,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "outFile": "dist/oubliation.js",
@@ -18,7 +18,7 @@
         "insertSpaceBeforeAndAfterBinaryOperators": true,
         "insertSpaceAfterKeywordsInControlFlowStatements": true,
         "insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-        "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+        "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
         "placeOpenBraceOnNewLineForFunctions": false,
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
