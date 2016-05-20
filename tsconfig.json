@@ -1,11 +1,16 @@
 {
     "compilerOptions": {
         "allowJs": true,
+        "charset": "utf8",
+        "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
+        "noImplicitReturns": true,
         "outFile": "dist/oubliation.js",
+        "pretty": true,
+        "removeComments": true,
         "sourceMap": true,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": false,
 		"target": "es2015"
     },
     "formatCodeOptions": {
