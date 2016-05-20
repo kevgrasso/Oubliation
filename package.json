@@ -20,7 +20,8 @@
 		"bower": "latest",
 		"tslint": "latest",
 		"typescript": "latest",
-		"typings": "latest"
+		"typings": "latest",
+		"uglify-js": "latest"
 	},
 	
 	"scripts": {
@@ -31,6 +32,6 @@
         
         "start": "#start server & watch",
         "stop": "#can this be done?",
-        "test": ""
+        "test": "#look up what library to use"
 	}
 }

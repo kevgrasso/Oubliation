@@ -6,7 +6,7 @@
         "preserveConstEnums": true,
         "outFile": "dist/oubliation.js",
         "sourceMap": true,
-		"target": "es6"
+		"target": "es2015"
     },
     "formatCodeOptions": {
         "indentSize": 4,
