@@ -32,10 +32,10 @@ class ComponentHub {
 }
 
 class ComponentPack {
-        private componentSpecs: {
-            class: new (...args: any[]) => ComponentNode
-            args: any[]
-        }[]
+    private componentSpecs: {
+        class: new (...args: any[]) => ComponentNode
+        args: any[]
+    }[]
         
     constructor(private kind: string, ...componentSpecs: [new (...args: any[]) => ComponentNode, any[]][]) {
         for (let componentSpec of componentSpecs) {
@@ -52,8 +52,7 @@ class ComponentPack {
     
     public getComponents(owner: ComponentHub) {
         return _.map(this.componentSpecs, (componentSpec) => {
-            let args = componentSpec.args.splice(0, 0, ComponentHub)
-            return new componentSpec.class(...args)
+            return new componentSpec.class(owner, ...componentSpec.args)
         })
     }
 }
