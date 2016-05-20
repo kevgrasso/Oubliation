@@ -15,7 +15,7 @@
         "quotemark": [true,
             "double"
         ],
-        "semicolon": true,
+        "semicolon": [true, "never"],
         "whitespace": [true,
             "check-branch",
             "check-operator",
