@@ -4,6 +4,7 @@
         "comment-format": [true,
             "check-space"
         ],
+        "curly": true,
         "indent": [true,
             "spaces"
         ],
@@ -15,7 +16,9 @@
         "quotemark": [true,
             "double"
         ],
-        "semicolon": [true, "never"],
+        "semicolon": [true,
+            "never"
+        ],
         "whitespace": [true,
             "check-branch",
             "check-operator",
@@ -34,7 +37,13 @@
             "check-catch",
             "check-else"
         ],
+        "no-arg": true,
+        "no-construct": true,
+        "no-duplicate-key": true,
+        "no-duplicate-variable": true,
+        "no-eval": true,
         "no-internal-module": true,
+        "no-invalid-this": true,
         "no-trailing-whitespace": true,
         "no-inferrable-types": true,
         "no-null": true,

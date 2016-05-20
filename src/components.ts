@@ -1,4 +1,6 @@
 
+"use strict"
+
 class ComponentHub {
     constructor(private spec: {[kind:string]: number}, ...componentSpecs: [new (...any) => ComponentPack, any[]][]) {
         for (let kind in spec) {
