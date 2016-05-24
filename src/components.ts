@@ -1,20 +1,20 @@
-
-'use strict'
-
 class ComponentHub {
     private componentKinds: {[kind: string]: ComponentPack[]}
     private componentPacks: Map<ComponentPack, ComponentNode[]>
-    private componentMethods: {[method: string]: ComponentNode[]}
+    private componentMethods: {[method: string]: (Function)[]}
     
-    constructor(private spec: {[kind: string]: number}, ...componentSpecs: [new (...args: any[]) => ComponentPack, any[]][]) {
-        for (let kind of Object.getOwnPropertyNames(spec)) {
+    constructor(private hubSpec: {[kind: string]: number}, ...componentSpecs: [new (...args: any[]) => ComponentPack, any[]][]) {
+        for (const kind of Object.getOwnPropertyNames(hubSpec)) {
             this.componentKinds[kind] = []
         }
         
-        for (let componentSpec of componentSpecs) {
-            let args = componentSpec[1].splice(0, 0, this)
-            this.addPack(new componentSpec[0](...args))
+        for (const componentSpec of componentSpecs) {
+            this.addPack(new componentSpec[0](this, ...componentSpec[1]))
         }
+    }
+    
+    public getNumSlotsOpen(kind: string) {
+        return this.hubSpec[kind] - this.componentKinds[kind].length
     }
     
     public hasPack(componentPack: ComponentPack) {
@@ -23,12 +23,46 @@ class ComponentHub {
     }
     
     public addPack(componentPack: ComponentPack) {
-        // TODO
+        const kind = componentPack.getKind()
+        if (this.getNumSlotsOpen(kind) > 0) {
+            const componentSlots = this.componentKinds[kind]
+            const componentNodes = componentPack.getComponents(this)
+            
+            //insert pack into kinds table
+            Utils.sortedInsert(componentSlots, $$$$)
+            //insert nodes into packs table
+            this.componentPacks.set(componentPack, componentNodes)
+            
+            const componentMethods = this.componentMethods
+            for (const componentNode of componentNodes) {
+                const priority = componentNode.getPriority()
+                for (const componentMethod of componentNode.getMethodNames()) {
+                    
+                    //initialize if empty
+                    if (componentMethods[componentMethod] == null) {
+                        componentMethods[componentMethod] = []
+                    }
+                    
+                    componentMethods[componentMethod].push(_.bind(_.get<Function>(componentNode, componentMethod), componentNode)
+                    //FIXME: make this a sorted array. Should it be an array of nodes or of binded functions?
+                }
+                
+                
+            }
+        }
     }
     
     public removePack(componentPack: ComponentPack) {
-        // TODO
+        const slots = this.componentKinds[componentPack.getKind()]
+        Utils.remove(slots, componentPack)
+        this.componentPacks.delete(componentPack)
+        // TODO: remove methods from componentMethods
     }
+}
+
+type ComponentSpec = {
+    class: new (...args: any[]) => ComponentNode
+    args: any[]
 }
 
 class ComponentPack {
@@ -37,21 +71,16 @@ class ComponentPack {
         args: any[]
     }[]
         
-    constructor(private kind: string, ...componentSpecs: [new (...args: any[]) => ComponentNode, any[]][]) {
-        for (let componentSpec of componentSpecs) {
-            this.componentSpecs.push({
-                class: componentSpec[0],
-                args: componentSpec[1]
-            })
-        }
+    constructor(private kind: string, ...componentSpecs: ComponentSpec[]) {
+        this.componentSpecs = componentSpecs
     }
     
     public getKind() {
         return this.kind
     }
     
-    public getComponents(owner: ComponentHub) {
-        return _.map(this.componentSpecs, (componentSpec) => {
+    public getComponents(owner: ComponentHub): ComponentNode[] {
+        return _.map(this.componentSpecs, (componentSpec: ComponentSpec) => {
             return new componentSpec.class(owner, ...componentSpec.args)
         })
     }
@@ -66,6 +95,17 @@ class ComponentNode {
         if (args.length !== 0) {
             throw new Error('ComponentNode should not be called with arguments besides owner and priority')
         }
+    }
+    
+    public getMethodNames() {
+        const blacklist = ['']
+        return _.difference(
+            _.union(
+                _.functionsIn(this),
+                _.functionsIn(ComponentHub.prototype)
+            ),
+            blacklist
+        )
     }
     
     public getOwner() {
