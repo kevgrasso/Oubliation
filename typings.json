@@ -1,7 +1,8 @@
 {
   "dependencies": {},
   "devDependencies": {},
-  "ambientDependencies": {
-    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts"
+  "globalDependencies": {
+    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts",
+    "core-js": "github:DefinitelyTyped/DefinitelyTyped/core-js/core-js.d.ts"
   }
 }

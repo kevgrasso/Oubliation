@@ -1,37 +1,44 @@
 {
-	"name": "oubliation",
-	"version": "0.0.0-proto1",
-	"description": "A simple Wizardry clone.",
-	"author": "Kevin Grasso <kevgrasso@gmail.com>",
-	
-	"main": "dist/oubliation.js",
-	"typings": "",
-	"engine": "node >= 1.0.0",
-	"repository": {
-		"type": "git",
-		"url": ""
-	},
-	"bugs": {
-		"url": ""
-	},
-	"private": true,
-	
-	"dependencies": {
-		"bower": "latest",
-		"tslint": "latest",
-		"typescript": "latest",
-		"typings": "latest",
-		"uglify-js": "latest"
-	},
-	
-	"scripts": {
-        "preinstall": "npm install -g typescript && npm install -g typings && npm install -g bower",
-        "postinstall": "typings install && bower install",
-		"prebuild": "npm update -g && typings install && bower update",
-        "build": "tsc",
-        
-        "start": "#start server & watch",
-        "stop": "#can this be done?",
-        "test": "#look up what library to use"
-	}
+  "name": "oubliation",
+  "version": "0.0.0-proto0",
+  "description": "A simple Wizardry clone.",
+  "author": "Kevin Grasso <kevgrasso@gmail.com>",
+  
+  "main": "dist/oubliation.js",
+  "typings": "",
+  "engine": "node >= 1.0.0",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "private": true,
+  
+  "dependencies": {
+    "bower": "latest",
+    "mapcat": "latest",
+    "trash-cli": "latest",
+    "tslint": "latest",
+    "typescript": "latest",
+    "typings": "latest",
+    "uglify-js": "latest"
+  },
+  
+  "scripts": {
+    "postinstall": "typings install && bower install",
+    
+  "update": "npm update && typings install && bower update",
+    
+    "prebuild": "npm run update",
+    "build": "tsc",
+    "postbuild": "uglifyjs bower_components/lodash/dist/lodash.core.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
+    
+    "start": "#start server & watch",
+    "stop": "#can this be done?",
+    "test": "#look up what library to use",
+    
+    "env": "SET"
+  }
 }

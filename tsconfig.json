@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "allowJs": true,
         "charset": "utf8",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -9,9 +8,9 @@
         "pretty": true,
         "removeComments": true,
         "sourceMap": true,
-        "strictNullChecks": true,
+        //"strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": false,
-		"target": "es2015"
+		"target": "es5"
     },
     "formatCodeOptions": {
         "indentSize": 4,
@@ -28,10 +27,9 @@
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
     "files": [
-        "bower_components/core.js/client/shim.js",
-        "bower_components/lodash/dist/lodash.core.js",
-        "typings/browser.d.ts",
         "ext/hotfixes.d.ts",
-        "src/components.ts"
+        "src/components.ts",
+        "src/utilities.ts",
+        "typings/index.d.ts"
     ]
 }

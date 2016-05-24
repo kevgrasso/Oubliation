@@ -14,11 +14,6 @@
       [ "angular", "forEach" ]
     ],
     "class-name": true,
-    "comment-format": [
-      true,
-      "check-space",
-      "check-uppercase"
-    ],
     "curly": true,
     "eofline": true,
     "forin": true,
@@ -117,10 +112,6 @@
       true,
       "check-module",
       "check-function"
-    ],
-    "variable-name": [
-      true,
-      "check-format"
     ],
     "whitespace": [
       true,
