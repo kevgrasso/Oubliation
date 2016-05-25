@@ -14,6 +14,10 @@
       [ "angular", "forEach" ]
     ],
     "class-name": true,
+    "comment-format": [
+      true,
+      "check-space"
+    ],
     "curly": true,
     "eofline": true,
     "forin": true,
