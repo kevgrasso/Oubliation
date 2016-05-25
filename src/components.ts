@@ -1,11 +1,11 @@
 class ComponentHub {
-    private componentKinds: {[kind: string]: ComponentPack[]}
+    private componentKinds: {[kind: string]: Set<ComponentPack>}
     private componentPacks: Map<ComponentPack, ComponentNode[]>
-    private componentMethods: {[method: string]: (Function)[]}
+    private componentMethods: {[method: string]: (ComponentNode)[]}
     
     constructor(private hubSpec: {[kind: string]: number}, ...componentSpecs: [new (...args: any[]) => ComponentPack, any[]][]) {
         for (const kind of Object.getOwnPropertyNames(hubSpec)) {
-            this.componentKinds[kind] = []
+            this.componentKinds[kind] = new Set<ComponentPack>()
         }
         
         for (const componentSpec of componentSpecs) {
@@ -14,22 +14,21 @@ class ComponentHub {
     }
     
     public getNumSlotsOpen(kind: string) {
-        return this.hubSpec[kind] - this.componentKinds[kind].length
+        return this.hubSpec[kind] - this.componentKinds[kind].size
     }
     
     public hasPack(componentPack: ComponentPack) {
         const kind = componentPack.getKind()
-        return _.includes(this.componentKinds[kind], componentPack)
+        return this.componentKinds[kind].has(componentPack)
     }
     
     public addPack(componentPack: ComponentPack) {
         const kind = componentPack.getKind()
         if (this.getNumSlotsOpen(kind) > 0) {
-            const componentSlots = this.componentKinds[kind]
             const componentNodes = componentPack.getComponents(this)
             
             //insert pack into kinds table
-            Utils.sortedInsert(componentSlots, $$$$)
+            this.componentKinds[kind].add(componentPack)
             //insert nodes into packs table
             this.componentPacks.set(componentPack, componentNodes)
             
@@ -43,8 +42,8 @@ class ComponentHub {
                         componentMethods[componentMethod] = []
                     }
                     
-                    componentMethods[componentMethod].push(_.bind(_.get<Function>(componentNode, componentMethod), componentNode)
-                    //FIXME: make this a sorted array. Should it be an array of nodes or of binded functions?
+                    Utils.sortedInsert(componentMethods[componentMethod], componentNode)
+                    //NOTE: doesn't guarantee uniqueness
                 }
                 
                 
@@ -53,10 +52,17 @@ class ComponentHub {
     }
     
     public removePack(componentPack: ComponentPack) {
-        const slots = this.componentKinds[componentPack.getKind()]
-        Utils.remove(slots, componentPack)
+        this.componentKinds[componentPack.getKind()].delete(componentPack)
         this.componentPacks.delete(componentPack)
-        // TODO: remove methods from componentMethods
+        
+        const componentNodes = componentPack.getComponents(this)
+        const componentMethods = this.componentMethods
+        for (const componentNode of componentNodes) {
+            const priority = componentNode.getPriority()
+            for (const componentMethod of componentNode.getMethodNames()) {
+                Utils.remove(componentMethods[componentMethod], componentNode)
+            }
+        }
     }
 }
 
