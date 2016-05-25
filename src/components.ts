@@ -1,3 +1,5 @@
+// TODO: consider ComponentModule class
+
 class ComponentHub {
     private componentKinds: {[kind: string]: Set<ComponentPack>}
     private componentPacks: Map<ComponentPack, ComponentNode[]>
@@ -27,9 +29,9 @@ class ComponentHub {
         if (this.getNumSlotsOpen(kind) > 0) {
             const componentNodes = componentPack.getComponents(this)
             
-            //insert pack into kinds table
+            // insert pack into kinds table
             this.componentKinds[kind].add(componentPack)
-            //insert nodes into packs table
+            // insert nodes into packs table
             this.componentPacks.set(componentPack, componentNodes)
             
             const componentMethods = this.componentMethods
@@ -37,13 +39,13 @@ class ComponentHub {
                 const priority = componentNode.getPriority()
                 for (const componentMethod of componentNode.getMethodNames()) {
                     
-                    //initialize if empty
+                    // initialize if empty
                     if (componentMethods[componentMethod] == null) {
                         componentMethods[componentMethod] = []
                     }
                     
                     Utils.sortedInsert(componentMethods[componentMethod], componentNode)
-                    //NOTE: doesn't guarantee uniqueness
+                    // NOTE: doesn't guarantee uniqueness
                 }
                 
                 
