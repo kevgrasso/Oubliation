@@ -1,4 +1,37 @@
 // TODO: consider ComponentModule class
+// TODO: store binded methods and nodes together
+
+// experiment; don't use
+abstract class ComponentModule<T extends Function> {
+    public fire: T
+    private methods: T[]
+    private uniqMethods: T[]
+    
+    constructor() {
+        this.methods = []
+        this.uniqMethods = []
+    }
+    
+    public add(componentNode: ComponentNode, method: T) {
+        if (!_.includes<T>(componentNode, method)) {
+            throw new Error(`Function ${method} not found in ComponentNode ${componentNode}`)
+        }
+        
+        // NOTE: doesn't guarantee uniqueness, has no order
+        Utils.sortedInsert(this.methods, method)
+        this.uniqMethods = _.sortedUniq(this.methods)
+        
+    }
+    
+    public remove(componentNode: ComponentNode, method: T) {
+        if (!_.includes<T>(componentNode, method)) {
+            throw new Error(`Function ${method} not found in ComponentNode ${componentNode}`)
+        }
+        
+        Utils.remove(this.methods, method)
+        this.uniqMethods = _.sortedUniq(this.methods)
+    }
+}
 
 class ComponentHub {
     private componentKinds: {[kind: string]: Set<ComponentPack>}
@@ -44,7 +77,7 @@ class ComponentHub {
                         componentMethods[componentMethod] = []
                     }
                     
-                    Utils.sortedInsert(componentMethods[componentMethod], componentNode)
+                    Utils.sortedInsertBy(componentMethods[componentMethod], componentNode, _.method('getPriority'))
                     // NOTE: doesn't guarantee uniqueness
                 }
                 
@@ -94,7 +127,7 @@ class ComponentPack {
     }
 }
 
-class ComponentNode {
+abstract class ComponentNode {
     constructor(
         private owner: ComponentHub,
         private priority: number,
