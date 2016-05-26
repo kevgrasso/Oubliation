@@ -18,7 +18,7 @@
   
   "dependencies": {
     "bower": "latest",
-    "mapcat": "latest",
+    "source-map-concat-cli": "latest",
     "trash-cli": "latest",
     "tslint": "latest",
     "typescript": "latest",
