@@ -2,11 +2,13 @@
 // TODO: store binded methods and nodes together
 
 // experiment; don't use
-abstract class ComponentModule<T extends Function> {
+class ComponentModule<T extends Function> {
     public fire: T
+    protected uniqMethods: T[]
     private methods: T[]
-    private uniqMethods: T[]
     
+    // HACK: in 2.0, use specified this types so fire method can be described in constructor call & subclassing is not required
+    // HACK: in 2.1, use vararg types to describe fire method
     constructor() {
         this.methods = []
         this.uniqMethods = []
@@ -30,6 +32,12 @@ abstract class ComponentModule<T extends Function> {
         
         Utils.remove(this.methods, method)
         this.uniqMethods = _.sortedUniq(this.methods)
+    }
+}
+
+class SubModule extends ComponentModule<() => void> {
+    public fire: ( () => void ) = () => {
+        // fdsa
     }
 }
 
