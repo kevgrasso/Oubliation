@@ -1,50 +1,69 @@
 // TODO: consider ComponentModule class
 // TODO: store binded methods and nodes together
 
-// experiment; don't use
-class ComponentModule<T extends Function> {
+interface ComponentMethodData<T extends Function> {
+       origin: ComponentNode
+       source: T
+       method: T
+       priority: number
+} 
+
+class ComponentMethodModule<T extends Function> {
     public fire: T
-    protected uniqMethods: T[]
-    private methods: T[]
+    protected methods: T[]
+    private methodData: ComponentMethodData<T>[]
     
     // HACK: in 2.0, use specified this types so fire method can be described in constructor call & subclassing is not required
     // HACK: in 2.1, use vararg types to describe fire method
     constructor() {
+        this.methodData = []
         this.methods = []
-        this.uniqMethods = []
     }
     
     public add(componentNode: ComponentNode, method: T) {
-        if (!_.includes<T>(componentNode, method)) {
+        if (!_.includes<T>(Object.values(componentNode), method)) {
             throw new Error(`Function ${method} not found in ComponentNode ${componentNode}`)
         }
         
-        // NOTE: doesn't guarantee uniqueness, has no order
-        Utils.sortedInsert(this.methods, method)
-        this.uniqMethods = _.sortedUniq(this.methods)
+        let entry = {
+            origin: componentNode,
+            source: method,
+            method: _.bind<T, T>(method, componentNode),
+            priority: componentNode.getPriority()
+        }
+        
+        // NOTE: does not guarantee uniqueness
+        Utils.sortedInsertBy(this.methodData, entry, 'priority')
+        this.methods = _.map<ComponentMethodData<T>, T>(this.methodData, 'method')
         
     }
     
     public remove(componentNode: ComponentNode, method: T) {
-        if (!_.includes<T>(componentNode, method)) {
+        if (!_.includes<T>(Object.values(componentNode), method)) {
             throw new Error(`Function ${method} not found in ComponentNode ${componentNode}`)
         }
+        let result = _.remove(this.methodData, (data: ComponentMethodData<T>) => {
+            return data.origin === componentNode && data.source === method
+        })
         
-        Utils.remove(this.methods, method)
-        this.uniqMethods = _.sortedUniq(this.methods)
+        if (result.length === 0) {
+            throw new Error(`Function ${method} of ComponentNode ${componentNode} not found in module`)
+        }
+        this.methods = _.map<ComponentMethodData<T>, T>(this.methodData, 'method')
     }
 }
 
-class SubModule extends ComponentModule<() => void> {
+class TestModule extends ComponentMethodModule<() => void> {
     public fire: ( () => void ) = () => {
-        // fdsa
+        // ONLY FOR TESTING
+        return this.methods
     }
 }
 
 class ComponentHub {
     private componentKinds: {[kind: string]: Set<ComponentPack>}
     private componentPacks: Map<ComponentPack, ComponentNode[]>
-    private componentMethods: {[method: string]: (ComponentNode)[]}
+    private componentMethods: {[method: string]: ComponentMethodModule<Function>}
     
     constructor(private hubSpec: {[kind: string]: number}, ...componentSpecs: [new (...args: any[]) => ComponentPack, any[]][]) {
         for (const kind of Object.getOwnPropertyNames(hubSpec)) {
@@ -80,12 +99,9 @@ class ComponentHub {
                 const priority = componentNode.getPriority()
                 for (const componentMethod of componentNode.getMethodNames()) {
                     
-                    // initialize if empty
-                    if (componentMethods[componentMethod] == null) {
-                        componentMethods[componentMethod] = []
-                    }
+                    // TODO: handle nulls properly
                     
-                    Utils.sortedInsertBy(componentMethods[componentMethod], componentNode, _.method('getPriority'))
+                    componentMethods[componentMethod].add(componentNode, _.get<Function>(componentNode, 'getPriority'))
                     // NOTE: doesn't guarantee uniqueness
                 }
                 
@@ -103,7 +119,7 @@ class ComponentHub {
         for (const componentNode of componentNodes) {
             const priority = componentNode.getPriority()
             for (const componentMethod of componentNode.getMethodNames()) {
-                Utils.remove(componentMethods[componentMethod], componentNode)
+                componentMethods[componentMethod].remove(componentNode, _.get<Function>(componentNode, 'getPriority'))
             }
         }
     }
@@ -147,7 +163,7 @@ abstract class ComponentNode {
     }
     
     public getMethodNames() {
-        const blacklist = ['']
+        const blacklist: string[] = []
         return _.difference(
             _.union(
                 _.functionsIn(this),

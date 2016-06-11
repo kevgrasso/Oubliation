@@ -7,11 +7,11 @@ const Utils = {
         array.splice(_.sortedIndexBy(array, element, iteratee), 0, element)
     },
     
-    sortedRemove<T>(array: T[], element: T) {
-        array.splice(_.sortedIndexOf(array, element), 1)
-    },
-    
     remove<T>(array: T[], element: T) {
         array.splice(_.indexOf(array, element), 1)
+    },
+    
+    sortedRemove<T>(array: T[], element: T) {
+        array.splice(_.sortedIndexOf(array, element), 1)
     }
 }
