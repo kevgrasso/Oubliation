@@ -28,8 +28,9 @@
     },
     "files": [
         "ext/hotfixes.d.ts",
-        "src/componentHub.ts",
         "src/utilities.ts",
+        "src/componentHub.ts",
+        "src/components.ts",
         "typings/index.d.ts"
     ]
 }
