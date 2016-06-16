@@ -1,4 +1,6 @@
-type ComponentSpec = [new (...args: any[]) => ComponentNode, any[]]
+// OPTOMIZE: collapse Composite & Thing class into singleton with ids mapping to a list of leaves. use _.assign instead of classes & prototypes
+
+type ComponentSpec = [new (...args: any[]) => ComponentLeaf, any[]]
 
 interface ComponentMethodData<T extends Function> {
     method: T
@@ -9,11 +11,11 @@ const Components = {
         return _.map<ComponentMethodData<T>, T>(methodData, 'method')
     },
     
-    insertMethodData<T extends Function>(name: string, componentNodes: ComponentNode[], result: ComponentMethodData<T>[]): ComponentMethodData<T>[] {
+    insertMethodData<T extends Function>(name: string, componentNodes: ComponentLeaf[], result: ComponentMethodData<T>[]): ComponentMethodData<T>[] {
         for (const componentNode of componentNodes) {
-            const method = _.get<ComponentNode, T>(componentNode, name)
-            // only insert retrieved methods that aren't the invalid defaults 
-            if (method !== _.get<ComponentMethods, T>(ComponentMethods.prototype, name)) { 
+            const method = _.get<ComponentLeaf, T>(componentNode, name)
+            // only insert retrieved methods that aren't the invalid defaults
+            if (method !== _.get<ComponentInterface, T>(ComponentInterface.prototype, name)) { // HACK
                 const methodData: ComponentMethodData<T> = {
                     method: _.bind<T, T>(method, componentNode),
                     priority: componentNode.getPriority()
@@ -25,11 +27,11 @@ const Components = {
     }
 }
 
-abstract class ComponentHub {
-    private componentNodes: ComponentNode[]
+abstract class ComponentComposite {
+    private componentNodes: ComponentLeaf[]
 
     constructor(...componentSpecs: ComponentSpec[]) {
-        this.componentNodes = _.map<ComponentSpec, ComponentNode>(componentSpecs, (componentSpec: [new (...args: any[]) => ComponentNode, any[]]): ComponentNode => {
+        this.componentNodes = _.map<ComponentSpec, ComponentLeaf>(componentSpecs, (componentSpec: [new (...args: any[]) => ComponentLeaf, any[]]): ComponentLeaf => {
             // what's wrong with this coloring??
             return new componentSpec[0](this, ...componentSpec[1])
         })
@@ -56,9 +58,9 @@ abstract class ComponentHub {
 
 }
 
-abstract class ComponentNode extends ComponentMethods {
+abstract class ComponentLeaf extends ComponentInterface {
     constructor(
-        private owner: ComponentHub,
+        private owner: ComponentComposite,
         private priority: number,
         ...args: any[]  // HACK: get rid of this in later Typescript version if possible
     ) {

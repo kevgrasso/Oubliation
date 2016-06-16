@@ -18,6 +18,7 @@
   
   "dependencies": {
     "bower": "latest",
+    "cpy-cli": "latest",
     "source-map-concat-cli": "latest",
     "trash-cli": "latest",
     "tslint": "latest",
@@ -33,11 +34,13 @@
     
     "prebuild": "npm run update",
     "build": "tsc",
-    "postbuild": "uglifyjs bower_components/lodash/dist/lodash.core.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
+    "postbuild": "REM uglifyjs bower_components/lodash/dist/lodash.core.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
     
-    "start": "#start server & watch",
-    "stop": "#can this be done?",
-    "test": "#look up what library to use",
+    "minify": "REM",
+
+    "start": "REM start server & watch",
+    "stop": "REM can this be done?",
+    "test": "REM look up what library to use",
     
     "env": "SET"
   }

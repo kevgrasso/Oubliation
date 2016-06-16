@@ -27,10 +27,11 @@
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
     "files": [
+        "typings/index.d.ts",
         "ext/hotfixes.d.ts",
         "src/utilities.ts",
-        "src/componentHub.ts",
-        "src/components.ts",
-        "typings/index.d.ts"
+        "src/componentInterface.ts",
+        "src/componentCore.ts",
+        "src/componentConcrete.ts"
     ]
 }
