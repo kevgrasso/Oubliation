@@ -34,7 +34,7 @@
     
     "prebuild": "npm run update",
     "build": "tsc",
-    "postbuild": "REM uglifyjs bower_components/lodash/dist/lodash.core.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
+    "postbuild": "uglifyjs bower_components/lodash/dist/lodash.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
     
     "minify": "REM",
 

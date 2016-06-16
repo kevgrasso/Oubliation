@@ -1,6 +1,6 @@
 class Thing extends ComponentComposite implements ComponentInterface {
     public getDescription(): string {
-        return _(this.getAllMethods<() => string>('getDescription')).invokeMap(_.attempt).join(' ')
+        return _(this.getAllMethods<() => string>('getDescription')).invokeMap(_.call, null).join(' ')
     }
 }
 
