@@ -1,0 +1,5 @@
+cpy-cli
+source-map-concat-cli
+trash-cli
+bower-installer
+inline-source

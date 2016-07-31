@@ -1,0 +1,23 @@
+{
+  //unused tslint rules
+  "rules": {
+    "no-any": true,
+    "no-console": [
+      true
+    ],
+    "no-debugger": true,
+    "no-inferrable-types": true,
+    "no-mergeable-namespace": true,
+    "no-shadowed-variable": true,
+    "no-unused-variable": true,
+    "max-line-length": [
+      true,
+      140
+    ],
+    "variable-name": [
+      true,
+      "check-format",
+      "allow-pascal-case"
+    ]
+  }
+}
