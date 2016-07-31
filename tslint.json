@@ -75,7 +75,7 @@
       "avoid-escape"
     ],
     "radix": true,
-    "semicolon": [true, "never"],
+    "semicolon": [true, "always"],
     "switch-default": true,
     "trailing-comma": [
       true,
