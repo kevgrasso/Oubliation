@@ -30,8 +30,9 @@
         "typings/index.d.ts",
         "ext/hotfixes.d.ts",
         "src/utilities.ts",
-        "src/componentInterface.ts",
         "src/componentCore.ts",
-        "src/componentConcrete.ts"
+        "src/componentConcrete.ts",
+        "src/status.ts",
+        "src/actor.ts"
     ]
 }
