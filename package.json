@@ -18,9 +18,6 @@
   
   "dependencies": {
     "bower": "latest",
-    "cpy-cli": "latest",
-    "source-map-concat-cli": "latest",
-    "trash-cli": "latest",
     "tslint": "latest",
     "typescript": "latest",
     "typings": "latest",
