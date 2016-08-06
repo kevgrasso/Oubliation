@@ -3,6 +3,14 @@ interface NameTag {
     description: string;
 }
 
+enum Elements {
+
+}
+
+enum Target {
+
+}
+
 class CreatureData extends ComponentLeaf {
     private name: string;
     private status: Status;
@@ -21,7 +29,7 @@ class CreatureData extends ComponentLeaf {
     }
     public recieveHealing(healing: number) {
         this.health += healing;
-        const maxHealth = this.getOwner().getMaxHealth();
+        const maxHealth = this.owner.getMaxHealth();
         if (this.health > maxHealth) {
             this.health = maxHealth;
         }
@@ -31,7 +39,7 @@ class CreatureData extends ComponentLeaf {
         this.health -= damage;
         if (this.health <= 0) {
             this.health = 0;
-            this.getOwner().setStatus(Corpse);
+            this.owner.setStatus(Corpse);
         }
     }
 
@@ -44,7 +52,11 @@ enum BruceScore {
     mightily, luckily, godly, quickly, healthily, wittily 
 }
 
-class PlayerCreatureData extends ComponentLeaf {
+class PlayerCreatureData extends CreatureData {
+    private job: Job;
+    private species: Species;
+    private background: Background;
+
     private bruceBonus: {
         [bruceScore: number]: number
     };
@@ -52,7 +64,9 @@ class PlayerCreatureData extends ComponentLeaf {
     private witchMana: number[];
     private priestMana: number[];
 
-    private equipment: Item[]; // TODO: flesh out more
+    private equipment: {
+        [slot: string]: Item;
+    }; // TODO: flesh out more
     private inventory: Item[];
 
     private experience: number;
@@ -98,60 +112,62 @@ class PlayerCreatureData extends ComponentLeaf {
     public incExperience(amount: number) {
         this.experience += amount;
     }
-}
-
-class Job extends ComponentLeaf {
-    private bruceRequirements: {
-        [bruceScore: number]: number
-    };
-    private maxHealthGrowth: number;
-    private spells: any[]; // TODO: flesh out more
-    private expGrowthRate: number[];
-    private attackCount: number;
 
     public getLevel() {
-        return _.sortedLastIndex(this.expGrowthRate, this.getOwner().getExperience());
+        return _.sortedLastIndex(this.job.expGrowthRate, this.owner.getExperience());
     }
 
     public getMaxHealth() {
-        return this.getLevel() * this.maxHealthGrowth;
+        return this.getLevel() * this.job.maxHealthGrowth;
     }
 
     public getAttackCount() {
-        return this.attackCount;
+        return this.job.attackCount;
     }
-}
-
-class Species extends ComponentLeaf {
-// TODO: include equipment slot data?
-
-    private bruceBase: {
-        [bruceScore: number]: number
-    };
 
     public getBruceScore(score: BruceScore) {
-        return this.bruceBase[score];
-    }
-}
-
-class Background extends ComponentLeaf {
-    private bruceGainRate: {
-        [bruceScore: number]: number
-    };
-    private rival: string;
-    private jobBlacklist: string[];
-
-    public getBruceScore(score: BruceScore) {
-        return this.bruceGainRate[score] * this.getOwner().getLevel();
+        return this.background.bruceGainRate[score] * this.owner.getLevel();
     }
 
     public isRival(creature: PlayerCreature) {
-        return creature.getJobName();
+        return creature.getJobName() === this.owner.getJobName();
     }
 
     public isIncompatibleJob(job: Job) {
         
     }
+
+    public getBruceScore(score: BruceScore) {
+        return this.species.bruceBase[score];
+    }
+}
+
+interface Job {
+    bruceRequirements: {
+        [bruceScore: number]: number
+    };
+    maxHealthGrowth: number;
+    spells: any[]; // TODO: flesh out more
+    expGrowthRate: number[];
+    attackCount: number;
+}
+
+interface Species {
+    slots: {
+        [slot: string]: boolean;
+    }
+
+    bruceBase: {
+        [bruceScore: number]: number
+    };
+}
+
+interface Background {
+    bruceGainRate: {
+        [bruceScore: number]: number
+    };
+    rival: string;
+    jobBlacklist: string[];
 }
 
 // items
@@ -183,8 +199,8 @@ class WeaponData extends ComponentLeaf {
 
     private accuracy: number;
     private power: number;
-    private target: any;
-    private element: any;
+    private target: Target;
+    private element: Elements;
 
 
     public getElementalAffinity() {
