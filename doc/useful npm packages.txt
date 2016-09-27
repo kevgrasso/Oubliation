@@ -1,5 +1,8 @@
-cpy-cli
+copyfiles
 source-map-concat-cli
 trash-cli
-bower-installer
+uglify-js
 inline-source
+bower-installer
+plato
+istanbul

@@ -1,16 +1,19 @@
 {
     "compilerOptions": {
         "charset": "utf8",
+        "lib": ["es2017"],
+        "module": "none",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
+        "noImplicitThis": true,
         "outFile": "dist/oubliation.js",
         "pretty": true,
         "removeComments": true,
         "sourceMap": true,
-        //"strictNullChecks": true,
+        "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": false,
-		"target": "es5"
+		"target": "es6"
     },
     "formatCodeOptions": {
         "indentSize": 4,
@@ -27,10 +30,10 @@
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
     "files": [
-        "typings/index.d.ts",
         "ext/hotfixes.d.ts",
         "src/utilities.ts",
         "src/status.ts",
-        "src/actor.ts"
+        "src/creature.ts",
+        "src/player_creature.ts"
     ]
 }

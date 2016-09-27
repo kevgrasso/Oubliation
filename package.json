@@ -3,7 +3,6 @@
   "version": "0.0.0-proto0",
   "description": "A simple Wizardry clone.",
   "author": "Kevin Grasso <kevgrasso@gmail.com>",
-  
   "main": "dist/oubliation.js",
   "typings": "",
   "engine": "node >= 1.0.0",
@@ -15,30 +14,20 @@
     "url": ""
   },
   "private": true,
-  
   "dependencies": {
-    "bower": "latest",
+    "@types/lodash": "latest",
+    "copyfiles": "latest",
+    "core-js": "latest",
+    "lodash": "latest",
     "tslint": "latest",
-    "typescript": "latest",
-    "typings": "latest",
-    "uglify-js": "latest"
+    "typescript": "latest"
   },
-  
   "scripts": {
-    "postinstall": "typings install && bower install",
-    
-  "update": "npm update && typings install && bower update",
-    
-    "prebuild": "npm run update",
+    "prebuild": "npm update",
     "build": "tsc",
-    "postbuild": "uglifyjs bower_components/lodash/dist/lodash.js bower_components/core.js/client/shim.js dist/oubliation.js --in-source-map dist/oubliation.js.map --source-map-url oubliation.js.map --source-map dist/oubliation.js.map -c warnings=false --screw-ie8 -o dist/oubliation.js",
-    
-    "minify": "REM",
-
+    "postbuild": "copyfiles -f 'res/**/*' node_modules/lodash/lodash.js node_modules/core-js/client/shim.js dist",
     "start": "REM start server & watch",
     "stop": "REM can this be done?",
-    "test": "REM look up what library to use",
-    
-    "env": "SET"
+    "test": "REM look up what library to use"
   }
 }
