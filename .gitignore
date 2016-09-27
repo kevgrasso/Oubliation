@@ -1,5 +1,4 @@
 *.map
 \.vscode
-\bower_components
 \node_modules
 \tmp
