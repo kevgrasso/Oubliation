@@ -30,7 +30,6 @@
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
     "files": [
-        "ext/hotfixes.d.ts",
         "src/utilities.ts",
         "src/status.ts",
         "src/creature.ts",

@@ -15,17 +15,21 @@
   },
   "private": true,
   "dependencies": {
-    "@types/lodash": "latest",
+    "@types/immutable": "latest",
+    "@types/mathjs": "latest",
+    "@types/mustache": "latest",
     "copyfiles": "latest",
     "core-js": "latest",
-    "lodash": "latest",
+    "immutable": "latest",
+    "mathjs": "latest",
+    "mustache": "latest",
     "tslint": "latest",
     "typescript": "latest"
   },
   "scripts": {
     "prebuild": "npm update",
     "build": "tsc",
-    "postbuild": "copyfiles -f 'res/**/*' node_modules/lodash/lodash.js node_modules/core-js/client/shim.js dist",
+    "postbuild": "copyfiles -f 'res/**/*' node_modules/mustache/mustache.js node_modules/mathjs/dist/math.js node_modules/immutable/dist/immutable.js node_modules/core-js/client/shim.js dist",
     "start": "REM start server & watch",
     "stop": "REM can this be done?",
     "test": "REM look up what library to use"

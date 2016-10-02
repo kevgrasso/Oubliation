@@ -1,8 +1,7 @@
-copyfiles
 source-map-concat-cli
 trash-cli
 uglify-js
 inline-source
-bower-installer
 plato
 istanbul
+tween.js
