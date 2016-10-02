@@ -1,8 +1,3 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Utils;
 (function (Utils) {
     'use strict';
@@ -24,171 +19,157 @@ var Utils;
     Utils.sortedRemove = sortedRemove;
 })(Utils || (Utils = {}));
 ;
-var HasModifier = (function () {
-    function HasModifier(priority, modifier) {
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+};
+class HasModifier {
+    constructor(priority, modifier) {
         this.priority = priority;
         this.modifier = modifier;
     }
-    HasModifier.prototype.getPriority = function () {
+    getPriority() {
         return this.priority;
-    };
-    HasModifier.prototype.getModifier = function () {
+    }
+    getModifier() {
         return this.modifier;
-    };
-    return HasModifier;
-}());
-var Status = (function (_super) {
-    __extends(Status, _super);
-    function Status() {
-        _super.call(this, 5, null);
     }
-    Status.prototype.getName = function () {
+}
+class Status extends HasModifier {
+    constructor() {
+        super(5, undefined);
+    }
+    getName() {
         return this.name;
-    };
-    return Status;
-}(HasModifier));
-var Healthy = (function (_super) {
-    __extends(Healthy, _super);
-    function Healthy() {
-        _super.apply(this, arguments);
     }
-    return Healthy;
-}(Status));
-var Corpse = (function (_super) {
-    __extends(Corpse, _super);
-    function Corpse() {
-        _super.apply(this, arguments);
-    }
-    return Corpse;
-}(Status));
-var Creature = (function () {
-    function Creature() {
-    }
-    Creature.prototype.getName = function () {
+}
+class Healthy extends Status {
+}
+class Corpse extends Status {
+}
+class Creature {
+    getName() {
         return this.name;
-    };
-    Creature.prototype.setStatus = function (status) {
+    }
+    setStatus(status) {
         this.status = status;
-    };
-    Creature.prototype.getHealth = function () {
+    }
+    getHealth() {
         return this.getHealth;
-    };
-    Creature.prototype.recieveHealing = function (healing) {
+    }
+    recieveHealing(healing) {
         this.health += healing;
-        var maxHealth = this.getMaxHealth();
+        const maxHealth = this.getMaxHealth();
         if (this.health > maxHealth) {
             this.health = maxHealth;
         }
-    };
-    Creature.prototype.recieveDamage = function (damage) {
+    }
+    recieveDamage(damage) {
         this.health -= damage;
         if (this.health <= 0) {
             this.health = 0;
             this.status = new Corpse();
         }
-    };
-    Creature.prototype.getStatus = function () {
+    }
+    getStatus() {
         return this.status;
-    };
-    return Creature;
-}());
-var Controller = (function () {
-    function Controller() {
     }
-    return Controller;
-}());
-var Command = (function () {
-    function Command(apply) {
-        this.apply = apply;
+}
+class Controller {
+    pickTarget(source, target) {
+        return new Promise((resolve, reject) => {
+        });
     }
-    return Command;
-}());
-var EffectCommand = (function () {
-    function EffectCommand(effect) {
-        this.effect = effect;
+    scheduleInteraction(source, target) {
+        return new Promise((resolve, reject) => {
+        });
     }
-    EffectCommand.prototype.getEffect = function () {
-        return this.effect;
-    };
-    EffectCommand.prototype.apply = function (controller) {
-    };
-    return EffectCommand;
-}());
-var Item = (function (_super) {
-    __extends(Item, _super);
-    function Item(priority, modifier, name, description, price, command) {
-        _super.call(this, priority, modifier);
+}
+class Item extends HasModifier {
+    constructor(priority, modifier, name, description, price, ability) {
+        super(priority, modifier);
         this.name = name;
         this.description = description;
         this.price = price;
-        if (command != null) {
-            this.command = command;
+        if (typeof ability === 'function') {
+            this.func = ability;
+        }
+        else {
+            this.effect = ability;
         }
     }
-    Item.prototype.getName = function () {
+    getName() {
         return this.name;
-    };
-    Item.prototype.getPrice = function () {
+    }
+    getPrice() {
         return this.price;
-    };
-    Item.prototype.canApply = function (controller) {
-        var command = this.command;
-        if (command != null) {
-            if (command instanceof EffectCommand) {
-                return true;
-            }
-            else {
-                return true;
-            }
+    }
+    getEffect() {
+        let effect = this.effect;
+        if (effect != null) {
+            return effect;
+        }
+        else {
+            return null;
+        }
+    }
+    canApply(controller) {
+        if (this.effect != null) {
+            return true;
+        }
+        else if (this.func != null) {
+            return true;
         }
         else {
             return false;
         }
-    };
-    Item.prototype.getEffect = function () {
-        var command = this.command;
-        if (command instanceof EffectCommand) {
-            return command.getEffect();
-        }
-        else {
-            return null;
-        }
-    };
-    Item.prototype.apply = function (controller) {
-        this.command.apply(controller);
-    };
-    Item.prototype.getModifier = function () {
+    }
+    apply(controller) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.effect != null) {
+                return Promise.reject('abort');
+            }
+            else if (this.func != null) {
+                return this.func(controller);
+            }
+            else {
+                throw new Error(`Item ${this.name} can not be applied.`);
+            }
+        });
+    }
+    getModifier() {
         if (this.areModifiersActive()) {
-            return _super.prototype.getModifier.call(this);
+            return super.getModifier();
         }
         else {
-            return null;
+            return undefined;
         }
-    };
-    Item.prototype.areModifiersActive = function () {
+    }
+    areModifiersActive() {
         return true;
-    };
-    return Item;
-}(HasModifier));
-var Equipment = (function (_super) {
-    __extends(Equipment, _super);
-    function Equipment(priority, modifier, name, description, price, slot, armorRank) {
-        _super.call(this, priority, modifier, name, description, price, function (controller) {
+    }
+}
+class Equipment extends Item {
+    constructor(priority, modifier, name, description, price, slot, armorRank) {
+        super(priority, modifier, name, description, price, (controller) => {
         });
         this.slot = slot;
         this.armorRank = armorRank;
     }
-    Equipment.prototype.getSlot = function () {
+    getSlot() {
         return this.slot;
-    };
-    Equipment.prototype.getArmorRank = function () {
+    }
+    getArmorRank() {
         return this.armorRank;
-    };
-    Equipment.prototype.getModifiers = function () {
-        return _super.prototype.getModifier.call(this);
-    };
-    return Equipment;
-}(Item));
+    }
+    getModifiers() {
+        return super.getModifier();
+    }
+}
 var Archetype;
 (function (Archetype) {
 })(Archetype || (Archetype = {}));
@@ -198,7 +179,7 @@ var Target;
 var SideEffect;
 (function (SideEffect) {
 })(SideEffect || (SideEffect = {}));
-var maxItems = 10;
+const maxItems = 10;
 var BruceScore;
 (function (BruceScore) {
     BruceScore[BruceScore["mightily"] = 0] = "mightily";
@@ -208,127 +189,130 @@ var BruceScore;
     BruceScore[BruceScore["healthily"] = 4] = "healthily";
     BruceScore[BruceScore["wittily"] = 5] = "wittily";
 })(BruceScore || (BruceScore = {}));
-var PlayerCreature = (function (_super) {
-    __extends(PlayerCreature, _super);
-    function PlayerCreature() {
-        _super.apply(this, arguments);
-    }
-    PlayerCreature.prototype.getWitchMana = function (spellLevel) {
+class PlayerCreature extends Creature {
+    getWitchMana(spellLevel) {
         return this.witchMana[spellLevel];
-    };
-    PlayerCreature.prototype.getMaxWitchMana = function (spellLevel) {
+    }
+    getMaxWitchMana(spellLevel) {
         return this.getBruceScore(BruceScore.wittily) * this.getLevel() / spellLevel;
-    };
-    PlayerCreature.prototype.payWitchMana = function (spellLevel, amount) {
+    }
+    payWitchMana(spellLevel, amount) {
         this.witchMana[spellLevel] -= amount;
         if (this.witchMana[spellLevel] < 0) {
             throw new Error('Paid more witch mana than available');
         }
-    };
-    PlayerCreature.prototype.getPriestMana = function (level) {
+    }
+    getPriestMana(level) {
         return this.priestMana[level];
-    };
-    PlayerCreature.prototype.getMaxPriestMana = function (spellLevel) {
+    }
+    getMaxPriestMana(spellLevel) {
         return this.getBruceScore(BruceScore.godly) * this.getLevel() / spellLevel;
-    };
-    PlayerCreature.prototype.payPriestMana = function (spellLevel, amount) {
+    }
+    payPriestMana(spellLevel, amount) {
         this.priestMana[spellLevel] -= amount;
         if (this.priestMana[spellLevel] < 0) {
             throw new Error('Paid more priest mana than available');
         }
-    };
-    PlayerCreature.prototype.getExperience = function () {
+    }
+    getExperience() {
         return this.experience;
-    };
-    PlayerCreature.prototype.incExperience = function (amount) {
+    }
+    incExperience(amount) {
         this.experience += amount;
-    };
-    PlayerCreature.prototype.getJobName = function () {
+    }
+    getJobName() {
         return this.job.name;
-    };
-    PlayerCreature.prototype.getLevel = function () {
+    }
+    getLevel() {
         return _.sortedLastIndex(this.job.expGrowthRate, this.experience);
-    };
-    PlayerCreature.prototype.getMaxHealth = function () {
+    }
+    getMaxHealth() {
         return this.getLevel() * this.job.maxHealthGrowth;
-    };
-    PlayerCreature.prototype.getAttackCount = function () {
+    }
+    getAttackCount() {
         return this.job.attackCount;
-    };
-    PlayerCreature.prototype.getSpeciesName = function () {
+    }
+    getSpeciesName() {
         return this.species.name;
-    };
-    PlayerCreature.prototype.getSlots = function () {
+    }
+    getSlots() {
         return _.keys(this.species.slots);
-    };
-    PlayerCreature.prototype.hasSlot = function (slot) {
+    }
+    hasSlot(slot) {
         return this.species.slots[slot] === true;
-    };
-    PlayerCreature.prototype.getBackgroundName = function () {
+    }
+    getBackgroundName() {
         return this.background.name;
-    };
-    PlayerCreature.prototype.isRival = function (creature) {
+    }
+    isRival(creature) {
         return creature.getBackgroundName() === this.background.rival;
-    };
-    PlayerCreature.prototype.isIncompatibleJob = function (jobName) {
+    }
+    isIncompatibleJob(jobName) {
         return jobName in this.background.jobBlacklist;
-    };
-    PlayerCreature.prototype.getBruceScore = function (score) {
+    }
+    getBruceScore(score) {
         return this.bruceBonus[score] + (this.background.bruceGainRate[score] * this.getLevel()) + this.species.bruceBase[score];
-    };
-    PlayerCreature.prototype.getEquipment = function () {
+    }
+    getEquipment() {
         return this.equipment;
-    };
-    PlayerCreature.prototype.getInventory = function () {
+    }
+    getInventory() {
         return this.inventory;
-    };
-    PlayerCreature.prototype.addItem = function (item) {
-        var inventory = this.inventory;
+    }
+    addItem(item) {
+        const inventory = this.inventory;
         inventory.push(item);
         if (inventory.length > maxItems) {
-            throw new Error("player creature " + this.getName() + "'s inventory is full'");
+            throw new Error(`player creature ${this.getName()}'s inventory is full'`);
         }
-    };
-    PlayerCreature.prototype.removeItem = function (item) {
-        var inventory = this.inventory;
-        var index = _.indexOf(inventory, item);
+    }
+    removeItem(item) {
+        const inventory = this.inventory;
+        const index = _.indexOf(inventory, item);
         if (index === -1) {
-            throw new Error("item " + item.getName() + " is not in player creature " + this.getName() + "'s' inventory");
+            throw new Error(`item ${item.getName()} is not in player creature ${this.getName()}'s' inventory`);
         }
         else {
             inventory.splice(index, 1);
         }
-    };
-    PlayerCreature.prototype.equip = function (item) {
-        var equipment = this.equipment;
-        var slot = item.getSlot();
+    }
+    equip(item) {
+        const equipment = this.equipment;
+        const slot = item.getSlot();
         if (!this.hasSlot(slot)) {
-            throw new Error("Player creature " + this.getName + " doesn't have slot " + slot);
+            throw new Error(`Player creature ${this.getName} doesn't have slot ${slot}`);
         }
         else if (equipment[slot] != null) {
-            throw new Error("Player creature " + this.getName + " already has equipment in slot " + slot);
+            throw new Error(`Player creature ${this.getName} already has equipment in slot ${slot}`);
         }
         else {
             this.removeItem(item);
             equipment[item.getSlot()] = item;
         }
-    };
-    PlayerCreature.prototype.unequip = function (slot) {
-        var equipment = this.equipment;
-        var item = equipment[slot];
-        if (item != null) {
-            throw new Error("Player creature " + this.getName + "'s slot " + slot + " is empty");
+    }
+    unequip(slot) {
+        const equipment = this.equipment;
+        const item = equipment[slot];
+        if (item == null) {
+            throw new Error(`Player creature ${this.getName}'s slot ${slot} is empty`);
         }
         else {
-            equipment[slot] = null;
+            delete this.equipment[slot];
             this.addItem(item);
         }
-    };
-    PlayerCreature.prototype.getModifiers = function () {
-        var modifiers = _.concat(_.values(this.equipment), this.inventory);
-        modifiers.push(this.getStatus());
+    }
+    getModifiers() {
+        const modifiers = [];
+        const modifierContainers = _.sortBy(_.values(this.equipment).concat(this.inventory, this.getStatus()), (container) => {
+            return container.getPriority();
+        });
+        for (const item of modifierContainers) {
+            const modifier = item.getModifier();
+            if (modifier != null) {
+                modifiers.push(modifier);
+            }
+        }
         return modifiers;
-    };
-    return PlayerCreature;
-}(Creature));
+    }
+}
 //# sourceMappingURL=oubliation.js.map
