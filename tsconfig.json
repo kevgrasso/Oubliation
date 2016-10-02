@@ -31,7 +31,6 @@
     },
     "files": [
         "src/utilities.ts",
-        "src/status.ts",
         "src/creature.ts",
         "src/player_creature.ts"
     ]
