@@ -30,8 +30,10 @@
         "placeOpenBraceOnNewLineForControlBlocks": false
     },
     "files": [
+        "node_modules/immutable/dist/immutable.d.ts",
         "src/utilities.ts",
         "src/creature.ts",
-        "src/player_creature.ts"
+        "src/player_creature.ts",
+        "src/debug.ts"
     ]
 }
