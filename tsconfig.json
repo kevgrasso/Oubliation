@@ -31,6 +31,7 @@
     },
     "files": [
         "node_modules/immutable/dist/immutable.d.ts",
+        "ext/immutable-ext.d.ts",
         "src/utilities.ts",
         "src/creature.ts",
         "src/player_creature.ts",
