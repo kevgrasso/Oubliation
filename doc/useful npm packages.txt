@@ -5,3 +5,4 @@ inline-source
 plato
 istanbul
 tween.js
+draggabilly
