@@ -1,21 +1,21 @@
 const maxItems = 10;
 
+enum BruceScore {
+    mightily, luckily, godly, quickly, healthily, wittily 
+}
+
 interface Job {
     readonly name: string;
-    readonly bruceRequirements: {
-        readonly [bruceScore: number]: number
-    };
+    readonly bruceRequirements: Immutable.Map<BruceScore, number>;
     readonly maxHealthGrowth: number;
-    readonly spells: ReadonlyArray<any>; // TODO: flesh out more
-    readonly expGrowthRate: ReadonlyArray<number>;
+    readonly spells: Immutable.OrderedSet<any>; // TODO: flesh out more
+    readonly expGrowthRate: Immutable.List<number>;
     readonly attackCount: number;
 }
 
 interface Species {
     readonly name: string;
-    readonly slots: {
-        readonly [slot: string]: boolean;
-    };
+    readonly slots: Immutable.Set<string>;
 
     readonly bruceBase: {
         readonly [bruceScore: number]: number
@@ -24,15 +24,42 @@ interface Species {
 
 interface Background {
     readonly name: string;
-    readonly bruceGainRate: {
-        readonly [bruceScore: number]: number
-    };
+    readonly bruceGainRate: Immutable.Map<BruceScore, number>;
     readonly rival: string;
-    readonly jobBlacklist: string[];
+    readonly jobBlacklist: Immutable.Set<string>;
 }
 
-enum BruceScore {
-    mightily, luckily, godly, quickly, healthily, wittily 
+type Affinity = (this: Creature, effect: EffectSpec, efficacy: number) => void;
+
+// NOTE: replace modifiers with `partial this` in Typescript 2.1? 
+interface Modifier {
+    readonly attackCount?: number;
+    readonly scale?: number;
+    
+    readonly affinity?: Immutable.Map<ElementSystem.Type, Affinity>;
+
+    readonly attack?: Immutable.Map<ElementSystem.Type, number>;
+    readonly defense?: Immutable.Map<ElementSystem.Type, number>;
+    readonly accuracy?: Immutable.Map<ElementSystem.Type, number>;
+    readonly evasion?: Immutable.Map<ElementSystem.Type, number>;
+
+    onStep?(this: Creature): void;
+    onTurn?(this: Creature): void;
+    onRecievedEffect?(this: Creature, opposingSource: boolean): void;
+    onSentEffect?(this: Creature, opposingTarget: boolean): void;
+    onDeath?(this: Creature): void;
+    onTotalPartyKill?(this: Creature): void;
+}
+
+interface PlayerModifier extends Modifier {
+    readonly level?: number;
+    readonly maxHealth?: number;
+    readonly bruceScore?: Immutable.Map<BruceScore, number>;
+    // add new slots
+
+    // use formula that can implement:
+    readonly maxWitchMana?: number;
+    readonly maxPriestMana?: number;
 }
 
 // TODO: add modifiers
@@ -41,22 +68,25 @@ class PlayerCreature extends Creature {
     private readonly species: Species;
     private readonly background: Background;
 
-    private readonly bruceBonus: {
-        readonly [bruceScore: number]: number
-    };
+    private readonly bruceBonus: Immutable.Map<BruceScore, number>;
 
-    private witchMana: number[];
-    private priestMana: number[];
+    private witchMana: Immutable.List<number>;
+    private priestMana: Immutable.List<number>;
 
-    private readonly equipment: {
-        [slot: string]: Item;
-    };
-    private readonly inventory: Item[];
+    private equipment: Immutable.Map<string, Item>;
+    private inventory: Immutable.OrderedSet<Item>;
 
     private experience: number;
 
+    
+    constructor(name: string, scale: Scale, status: Status, health: number) {
+        super(name, scale, status, health);
+
+        // TODO
+    }
+
     public getWitchMana(spellLevel: number) {
-        return this.witchMana[spellLevel];
+        return this.witchMana.get(spellLevel);
     }
 
     public getMaxWitchMana(spellLevel: number) {
@@ -64,14 +94,17 @@ class PlayerCreature extends Creature {
     }
 
     public payWitchMana(spellLevel: number, amount: number) {
-        this.witchMana[spellLevel] -= amount;
-        if (this.witchMana[spellLevel] < 0) {
+        this.witchMana.update(spellLevel, (value) => {
+            return value - amount;
+        });
+
+        if (this.witchMana.get(spellLevel) < 0) {
             throw new Error('Paid more witch mana than available');
         }
     }
 
-    public getPriestMana(level: number) {
-        return this.priestMana[level];
+    public getPriestMana(spellLevel: number) {
+        return this.priestMana.get(spellLevel);
     }
 
     public getMaxPriestMana(spellLevel: number) {
@@ -79,8 +112,11 @@ class PlayerCreature extends Creature {
     }
 
     public payPriestMana(spellLevel: number, amount: number) {
-        this.priestMana[spellLevel] -= amount;
-        if (this.priestMana[spellLevel] < 0) {
+        this.priestMana.update(spellLevel, (value) => {
+            return value - amount;
+        });
+
+        if (this.priestMana.get(spellLevel) < 0) {
             throw new Error('Paid more priest mana than available');
         }
     }
@@ -98,7 +134,10 @@ class PlayerCreature extends Creature {
     }
 
     public getLevel() {
-        return _.sortedLastIndex(this.job.expGrowthRate, this.experience);
+        const experience = this.experience;
+        return this.job.expGrowthRate.findLastIndex((value: number) => {
+            return value < experience;
+        });
     }
 
     public getMaxHealth() {
@@ -114,11 +153,11 @@ class PlayerCreature extends Creature {
     }
 
     public getSlots() {
-        return _.keys(this.species.slots);
+        return this.species.slots;
     }
 
     public hasSlot(slot: string) {
-        return this.species.slots[slot] === true;
+        return this.species.slots.has(slot);
     }
 
     public getBackgroundName() {
@@ -130,11 +169,11 @@ class PlayerCreature extends Creature {
     }
 
     public isIncompatibleJob(jobName: string) {
-        return jobName in this.background.jobBlacklist;
+        return !this.background.jobBlacklist.has(jobName);
     }
 
     public getBruceScore(score: BruceScore) {
-        return this.bruceBonus[score] + (this.background.bruceGainRate[score]*this.getLevel()) + this.species.bruceBase[score];
+        return this.bruceBonus.get(score) + (this.background.bruceGainRate.get(score)*this.getLevel()) + this.species.bruceBase[score];
     }
 
     public getEquipment() {
@@ -145,61 +184,53 @@ class PlayerCreature extends Creature {
         return this.inventory;
     }
 
+    public isInventoryFull() {
+        return this.inventory.size > maxItems;
+    }
+
     public addItem(item: Item) {
-        const inventory = this.inventory;
-        inventory.push(item);
-        if (inventory.length > maxItems) {
+        this.inventory = this.inventory.add(item);
+        if (this.isInventoryFull()) {
             throw new Error(`player creature ${this.getName()}'s inventory is full'`);
         }
     }
 
     public removeItem(item: Item) {
-        const inventory = this.inventory;
-        const index = _.indexOf(inventory, item);
-        if (index === -1) {
+        if (this.inventory.has(item)) {
             throw new Error(`item ${item.getName()} is not in player creature ${this.getName()}'s' inventory`);
         } else {
-            inventory.splice(index, 1);
+            this.inventory = this.inventory.delete(item);
         }
     }
 
     public equip(item: Equipment) {
-        const equipment = this.equipment;
         const slot = item.getSlot();
         if (!this.hasSlot(slot)) {
             throw new Error(`Player creature ${this.getName} doesn't have slot ${slot}`);
-        } else if (equipment[slot] != null) {
+        } else if (this.equipment.has(slot)) {
             throw new Error(`Player creature ${this.getName} already has equipment in slot ${slot}`);
         } else {
             this.removeItem(item);
-            equipment[item.getSlot()] = item;
+            this.equipment = this.equipment.set(slot, item);
         }
     }
 
     public unequip(slot: string) {
-        const equipment = this.equipment;
-        const item = equipment[slot];
-        if (item == null) {
+        if (this.equipment.has(slot)) {
             throw new Error(`Player creature ${this.getName}'s slot ${slot} is empty`);
         } else {
-            delete this.equipment[slot];
-            this.addItem(item);
+            this.addItem(this.equipment.get(slot));
+            this.equipment = this.equipment.delete(slot);
         }
     }
 
-    protected getModifiers() {
-        const modifiers: Modifier[] = [];
-        const modifierContainers = _.sortBy(_.values<Item | Status>(this.equipment).concat(this.inventory, this.getStatus()), (container: Item | Status) => {
-            return container.getPriority();
+    protected getModifiers<T>(mapper: (value: Modifier) => T)  {        
+        return this.equipment.toSeq().concat(this.inventory).sort((valueA: HasModifier<PlayerModifier>, valueB: HasModifier<PlayerModifier>) => {
+            return valueB.getPriority() - valueA.getPriority();
+          } ).map((value: Item) => {  
+            return mapper(value.getModifier());
+        }).filter((value: T): value is T => {
+            return value !== undefined;
         });
-
-        for (const item of modifierContainers) {
-            const modifier = item.getModifier();
-            if (modifier != null) {
-                modifiers.push(modifier);
-            }
-        }
-
-        return modifiers;
     }
 }
